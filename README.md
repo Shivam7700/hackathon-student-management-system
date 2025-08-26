@@ -199,7 +199,7 @@ Password: student
 - [x] Staff Profile Edit
 - [x] Student Profile Edit
 - [x] Student Dashboard Fixed
-- [x] Passing Page Title From View  - Improved
+- [x] Passing Page Title From View  
 - [x] Staff Dashboard Fixed
 - [x] Admin Dashboard Fixed
 - [x] Firebase Web Push Notifications
@@ -209,5 +209,11 @@ Password: student
 - [x] Student View Result
 - [x] Change all links to be dynamic
 - [x] Code Restructure - Very Important
+- [ ] Can talk to chatbot
+- [ ] Can access gps of student
+- [ ] Face Recogntion while attempting quiz
+- [ ] Grade prediction
+- [ ] Performance Analysis
+- [ ] Recommendation
 
 
