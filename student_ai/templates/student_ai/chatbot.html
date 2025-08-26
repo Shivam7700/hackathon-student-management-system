@@ -1,0 +1,26 @@
+{% extends "main_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>ChatAssistant</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="message" class="form-control" placeholder="Ask me anything..." required>
+                    <button type="submit" class="btn btn-success">Send</button>
+                </div>
+            </form>
+
+            {% if response %}
+            <div class="alert alert-info mt-3">
+                <strong>Bot:</strong> {{ response }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

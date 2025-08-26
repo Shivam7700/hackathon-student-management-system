@@ -1,0 +1,6 @@
+student_id,attendance,assignments,previous_score,final_grade,recommendations
+S001,95,90,92,93,"['Keep up the excellent work!', 'Participate in advanced projects.']"
+S002,80,75,78,80,"['Focus on assignments to improve scores.', 'Attend extra classes.']"
+S003,70,65,60,65,"['Increase study hours.', 'Submit all assignments on time.']"
+S004,60,50,55,50,"['Improve attendance.', 'Seek tutoring for weak subjects.']"
+S005,85,80,83,85,"['Maintain current performance.', 'Explore extra-curricular activities.']"

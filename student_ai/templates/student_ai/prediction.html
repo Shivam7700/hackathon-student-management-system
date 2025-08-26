@@ -1,0 +1,44 @@
+{% extends "main_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <!-- Card Wrapper -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>Grade Prediction</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="attendance" class="form-label">Attendance (%)</label>
+                            <input type="number" class="form-control" id="attendance" name="attendance" placeholder="Enter attendance" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="assignments" class="form-label">Assignments (%)</label>
+                            <input type="number" class="form-control" id="assignments" name="assignments" placeholder="Enter assignments score" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="previous_score" class="form-label">Previous Score</label>
+                            <input type="number" class="form-control" id="previous_score" name="previous_score" placeholder="Enter previous score" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Predict Grade</button>
+                    </form>
+
+                    {% if prediction %}
+                    <div class="alert alert-info mt-4 text-center">
+                        <h4>Predicted Final Grade: <strong>{{ prediction }}</strong></h4>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

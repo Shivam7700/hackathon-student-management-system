@@ -1,0 +1,177 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Session Analysis</h1>
+                <h4 class="text-muted">{{ session.quiz.title }} <small>[{{ session.session_code }}]</small></h4>
+            </div>
+            <div class="col-sm-6 text-right">
+                 <a href="{% url 'session_detail' session.id %}" class="btn btn-outline-info mt-3"><i class="fas fa-qrcode"></i> Show Join Code</a>
+                 <a href="{% url 'item_analysis' session.id %}" class="btn btn-outline-primary mt-3"><i class="fas fa-tasks"></i> Detailed Question Analysis</a>
+            </div>
+        </div>
+
+        {% if no_submissions %}
+            <div class="alert alert-warning text-center">
+                <h4>No Submissions Yet</h4>
+                <p>There is no data to analyze because no students have completed this quiz session yet. The dashboard will populate as results come in.</p>
+            </div>
+        {% else %}
+            <!-- Stat Boxes (High-Level Summary) -->
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>{{ total_students_joined }}</h3>
+                            <p>Students Submitted</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-primary">
+                        <div class="inner">
+                            <h3>{{ participation_rate|floatformat:1 }}<sup style="font-size: 20px">%</sup></h3>
+                            <p>Participation Rate</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-chart-pie"></i></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{ performance_stats.avg_score|floatformat:2 }}</h3>
+                            <p>Average Score</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-star-half-alt"></i></div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>{{ performance_stats.max_score|floatformat:2 }}</h3>
+                            <p>Highest Score</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-trophy"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart and Leaderboard Row -->
+            <div class="row">
+                <!-- Score Distribution Chart -->
+                <div class="col-md-6">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title">Score Distribution</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="scoreDistributionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Leaderboard Table -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Student Leaderboard</h3>
+                        </div>
+                        <div class="card-body table-responsive p-0" style="height: 300px;">
+                            <table class="table table-head-fixed text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Student Name</th>
+                                        <th>Score</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for attempt in student_attempts %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ attempt.student.admin.get_full_name }}</td>
+                                        <td><strong>{{ attempt.score|floatformat:2 }} / {{ total_marks_possible|floatformat:2 }}</strong></td>
+                                        <td>
+                                            {% if attempt.latitude and attempt.longitude %}
+                                                <a href="https://www.google.com/maps/search/?api=1&query={{ attempt.latitude }},{{ attempt.longitude }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="View location on map">
+                                                    <i class="fas fa-map-marker-alt"></i> View Map
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Not provided</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+{% if not no_submissions %}
+<!-- Make sure you have Chart.js included in your project's static files -->
+<script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+<script>
+$(function () {
+    // --- SCORE DISTRIBUTION CHART ---
+    var barChartCanvas = $('#scoreDistributionChart').get(0).getContext('2d');
+    var barChartData = {
+        labels: {{ histogram_data.labels|safe }},
+        datasets: [
+            {
+                label: 'Number of Students',
+                backgroundColor: 'rgba(60,141,188,0.9)',
+                borderColor: 'rgba(60,141,188,0.8)',
+                borderWidth: 1,
+                data: {{ histogram_data.data|safe }}
+            }
+        ]
+    };
+
+    var barChartOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        legend: { display: false },
+        scales: {
+            xAxes: [{
+                gridLines: { display: false },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Score Range (%)'
+                }
+            }],
+            yAxes: [{
+                ticks: { beginAtZero: true, stepSize: 1 }, // Ensures y-axis is in whole numbers for student counts
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Number of Students'
+                }
+            }]
+        }
+    };
+
+    // Create the chart
+    new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+    });
+});
+</script>
+{% endif %}
+{% endblock custom_js %}

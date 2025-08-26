@@ -1,0 +1,51 @@
+{% extends "main_app/base.html" %}
+
+
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <!-- Card Wrapper for Form -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>Automated Recommendations</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="student_id" class="form-label">Student ID</label>
+                            <input type="text" class="form-control" id="student_id" name="student_id" placeholder="Enter Student ID" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Get Recommendations</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if recs %}
+            <!-- Card Wrapper for Results -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white text-center">
+                    <h4>Recommendations</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for rec in recs %}
+                            <li class="list-group-item">{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger mt-3">
+    {{ error }}
+</div>
+{% endif %}
+{% endblock content %}
+
